@@ -38,3 +38,9 @@ Make sure to deploy the output of `npm run build`
 ## Styling
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+
+## References
+
+- https://onnxruntime.ai/docs/tutorials/web/classify-images-nextjs-github-template.html
+- https://github.com/microsoft/onnxruntime-web-demo
+- https://github.com/microsoft/onnxruntime-inference-examples

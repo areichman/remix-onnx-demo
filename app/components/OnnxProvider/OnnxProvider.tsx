@@ -18,10 +18,16 @@ export function OnnxProvider({children, modelUrl}: Props) {
   useEffect(() => {
     async function createSession() {
       const cache = await caches.open('models');
-      // const keys = await cache.keys()
-      // console.log(keys)
-      cache.add(modelUrl);
-      const response = await cache.match(modelUrl);
+      let response = await cache.match(modelUrl)
+
+      if (response) {
+        console.log('using cached model')
+      } else {
+        console.log('fetching model and adding to cache')
+        await cache.add(modelUrl)
+        response = await cache.match(modelUrl)
+      }
+
       const model = await response!.arrayBuffer()
       const session = await InferenceSession.create(model, {executionProviders: ['webgl']})
       setSession(session)
