@@ -44,3 +44,4 @@ This template comes with [Tailwind CSS](https://tailwindcss.com/) already config
 - https://onnxruntime.ai/docs/tutorials/web/classify-images-nextjs-github-template.html
 - https://github.com/microsoft/onnxruntime-web-demo
 - https://github.com/microsoft/onnxruntime-inference-examples
+- https://github.com/microsoft/onnxruntime/issues/19556
