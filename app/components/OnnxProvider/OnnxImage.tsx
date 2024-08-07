@@ -28,7 +28,7 @@ export function OnnxImage(props: React.DetailedHTMLProps<React.ImgHTMLAttributes
     // resize the tensor to match the model requirements
     const tensor = await Tensor.fromImage(imageData, {resizedWidth: width, resizedHeight: height})
 
-    // optionally reverse the tensor dimensions for thorn models
+    // optionally reverse the tensor dimensions
     const tensorReshaped = reverseDimensions ? tensor.reshape([1, width, height, 3]) : tensor
 
     // run the model
