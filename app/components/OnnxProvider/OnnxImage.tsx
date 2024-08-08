@@ -1,11 +1,23 @@
 import { Tensor } from "onnxruntime-web"
-import { createRef } from "react"
+import { createRef, useState } from "react"
 
 import { useModel } from "./OnnxProvider"
 
-export function OnnxImage(props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>) {
+interface Results {
+  output: Float32Array,
+  time: number
+}
+
+interface Props {
+  src: string
+  style? : React.CSSProperties
+  children?: (results: Results | undefined) => React.ReactNode
+}
+
+export function OnnxImage({src, style, children}: Props) {
   const ref = createRef<HTMLImageElement>()
   const {session, width, height, reverseDimensions} = useModel()
+  const [results, setResults] = useState<Results | undefined>()
 
   const runModel = async () => {
     if (!ref.current || !session) {
@@ -35,12 +47,23 @@ export function OnnxImage(props: React.DetailedHTMLProps<React.ImgHTMLAttributes
     const start = Date.now()
     const feeds: Record<string, Tensor> = {}
     feeds[session.inputNames[0]] = tensorReshaped
-    const output = await session.run(feeds);
+    const outputData = await session.run(feeds);
     const end = Date.now();
     const inferenceTime = (end - start);
-    
-    console.log({output, inferenceTime})
+    const output = outputData[session.outputNames[0]];
+   
+    setResults({
+      output: output.data as Float32Array, 
+      time: inferenceTime,
+    })
+
+    // document.body.appendChild(canvas)
   }
 
-  return <img ref={ref} alt="onnx-image" onLoad={runModel} {...props}  />
+  return (
+    <>
+      <img ref={ref} alt="onnx-image" src={src} style={style} onLoad={runModel} />
+      {children && children(results)}
+    </>
+  )
 }

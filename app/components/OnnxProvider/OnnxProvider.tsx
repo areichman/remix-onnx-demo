@@ -1,4 +1,5 @@
 import { InferenceSession } from "onnxruntime-web"
+import { InferenceSession as InferenceSessionWebGPU } from "onnxruntime-web/webgpu"
 import { createContext, useContext, useEffect, useState } from "react"
 
 interface ContextType {
@@ -25,7 +26,7 @@ interface Props {
   width?: number
   height?: number
   reverseDimensions?: boolean
-  executionProviders?: ('webgl' | 'wasm')[]
+  executionProvider?: 'webgl' | 'wasm' | 'webgpu'
 }
 
 export function OnnxProvider({
@@ -33,7 +34,7 @@ export function OnnxProvider({
   width = 224, 
   height = 224, 
   reverseDimensions = false,
-  executionProviders = ['webgl'],
+  executionProvider = 'webgl',
   children, 
 }: Props) {
   const [session, setSession] = useState<InferenceSession>()
@@ -53,7 +54,13 @@ export function OnnxProvider({
         }
 
         const model = await response!.arrayBuffer()
-        const session = await InferenceSession.create(model, {executionProviders})
+        let session: InferenceSession
+
+        if (executionProvider === 'webgpu') {
+          session = await InferenceSessionWebGPU.create(model, {executionProviders: ['webgpu']})
+        } else {
+          session = await InferenceSession.create(model, {executionProviders: [executionProvider]})
+        }
         setSession(session)
       }
 
@@ -63,7 +70,7 @@ export function OnnxProvider({
   )
 
   if (!session) {
-    return null
+    return <p>Loading model...</p>
   }
 
   const value = {
