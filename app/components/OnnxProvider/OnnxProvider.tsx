@@ -1,19 +1,22 @@
-import { InferenceSession } from "onnxruntime-web"
+import { InferenceSession, TensorFromImageElementOptions } from "onnxruntime-web"
 import { InferenceSession as InferenceSessionWebGPU } from "onnxruntime-web/webgpu"
 import { createContext, useContext, useEffect, useState } from "react"
 
+import { classifyImage } from "./classifyImage"
+
+interface Results {
+  output: Float32Array
+  time: number
+}
+
 interface ContextType {
-  session: InferenceSession | null,
-  width: number,
-  height: number,
-  reverseDimensions: boolean,
+  session?: InferenceSession,
+  run: (image: HTMLImageElement) => Promise<Results>
 }
 
 export const OnnxContext = createContext<ContextType>({
-  session: null,
-  width: 224,
-  height: 224,
-  reverseDimensions: true,
+  session: undefined,
+  run: async () => ({output: new Float32Array, time: 0})
 })
 
 export function useModel() {
@@ -21,22 +24,13 @@ export function useModel() {
 }
 
 interface Props {
-  children: React.ReactNode
   url: string
-  width?: number
-  height?: number
-  reverseDimensions?: boolean
-  executionProvider?: 'webgl' | 'wasm' | 'webgpu'
+  executionProviders?: InferenceSession.ExecutionProviderConfig[]
+  options?: TensorFromImageElementOptions
+  children: React.ReactNode
 }
 
-export function OnnxProvider({
-  url, 
-  width = 224, 
-  height = 224, 
-  reverseDimensions = false,
-  executionProvider = 'webgl',
-  children, 
-}: Props) {
+export function OnnxProvider({url, executionProviders = ['webgl'], options, children}: Props) {
   const [session, setSession] = useState<InferenceSession>()
 
   useEffect(
@@ -56,10 +50,10 @@ export function OnnxProvider({
         const model = await response!.arrayBuffer()
         let session: InferenceSession
 
-        if (executionProvider === 'webgpu') {
+        if (executionProviders.includes('webgpu')) {
           session = await InferenceSessionWebGPU.create(model, {executionProviders: ['webgpu']})
         } else {
-          session = await InferenceSession.create(model, {executionProviders: [executionProvider]})
+          session = await InferenceSession.create(model, {executionProviders})
         }
         setSession(session)
       }
@@ -75,9 +69,7 @@ export function OnnxProvider({
 
   const value = {
     session,
-    width,
-    height,
-    reverseDimensions,
+    run: (image: HTMLImageElement) => classifyImage(session!, image, options),
   }
 
   return (

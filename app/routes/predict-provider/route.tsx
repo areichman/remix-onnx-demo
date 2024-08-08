@@ -1,5 +1,5 @@
 import { OnnxProvider } from '~/components/OnnxProvider/OnnxProvider'
-import { OnnxImage } from '~/components/OnnxProvider/OnnxImage'
+import { OnnxImage, Results } from '~/components/OnnxProvider/OnnxImage'
 import { getPredictedClass } from '~/utils/imagenet'
 
 const models = {
@@ -27,29 +27,25 @@ export default function Route() {
 
       <div className="container flex flex-row flex-wrap gap-5">
         {urls.map(url => (
-          <div key={url}>
-            <OnnxImage src={url}>
-              {(results) => {
-                if (!results) {
-                  return <p>Running model...</p>
-                }
-
-                // squeezenet only
-                const {name, probability} = getPredictedClass(results.output)[0];
-                
-                return (
-                  <pre className="my-2 text-xs">
-                    {/* <p>{JSON.stringify(results.output, null, 2)}</p> */}
-                    <p>{name} ({(probability*100).toFixed(1)}%)</p>
-                    <p>{results.time} msec</p>
-                  </pre>
-                )
-              }}
-            </OnnxImage>
-          </div>
+          <OnnxImage key={url} src={url} size={224}>
+            {(results) => <ModelResults results={results} />}
+          </OnnxImage>
         ))}
       </div>
      
     </OnnxProvider>
+  )
+}
+
+function ModelResults({results}: {results: Results}) {
+  // squeezenet only
+  const {name, probability} = getPredictedClass(results.output)[0];
+  
+  return (
+    <pre className="my-2 text-xs">
+      {/* <p>{JSON.stringify(results.output, null, 2)}</p> */}
+      <p>{name} ({(probability*100).toFixed(1)}%)</p>
+      <p>{results.time} msec</p>
+    </pre>
   )
 }
