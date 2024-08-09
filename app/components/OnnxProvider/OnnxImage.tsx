@@ -1,3 +1,14 @@
+/* Sample usage:
+<OnnxImage src="foo.jpg">
+  {(results) => (
+    <div>
+      <p>{JSON.stringify(results.output, null, 2}</p>
+      <p>{results.time} msec</p>
+    </div>
+  )}
+</OnnxImage>
+*/
+
 import { createRef, useState } from "react"
 
 import { useModel } from "./OnnxProvider"

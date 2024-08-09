@@ -1,3 +1,19 @@
+/* Sample usage:
+
+<OnnxProvider url="/models/squeezenet.onnx">
+
+<OnnxProvider 
+  url="/models/internal.onnx"
+  executionProviders={['wasm']} 
+  options={{
+    tensorLayout: 'NHWC',
+    resizedHeight: 384,
+    resizedWidth: 384,
+    norm: {mean: 1, bias: 0},
+  }}
+>
+*/
+
 import { InferenceSession, TensorFromImageElementOptions } from "onnxruntime-web"
 import { InferenceSession as InferenceSessionWebGPU } from "onnxruntime-web/webgpu"
 import { createContext, useContext, useEffect, useState } from "react"

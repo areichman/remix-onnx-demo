@@ -1,5 +1,6 @@
 import { InferenceSession, Tensor, TensorFromImageElementOptions } from "onnxruntime-web"
-import { toNHWC } from "~/utils/toNHWC"
+
+import { toNHWC } from "./toNHWC"
 
 export async function classifyImage(session: InferenceSession, image: HTMLImageElement, options?: TensorFromImageElementOptions) {
   // TODO: Use the native NHWC option when available
