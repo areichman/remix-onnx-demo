@@ -15,8 +15,20 @@ const urls = [
   '/images/dogs.jpg',
 ]
 
-// <OnnxProvider url={models.squeezenet}>
-// <OnnxProvider url={models.internal} executionProvider="wasm" width={384} height={384} reverseDimensions={true}>
+/*
+<OnnxProvider url={models.squeezenet}>
+
+<OnnxProvider 
+  url={models.internal} 
+  executionProviders={['wasm']} 
+  options={{
+    tensorLayout: 'NHWC',
+    resizedHeight: 384,
+    resizedWidth: 384,
+    norm: {mean: 1, bias: 0},
+  }}
+>
+*/
 
 export default function Route() {
   const url = models.squeezenet
